@@ -165,15 +165,15 @@ def compare_labels(dict_tuto_labels, filename_to_labels):
     # Compare N and Ny and generate the explanation
     if N != Ny:
         if Ny == 2:
-            explanation = "Attention au Cb !"
+            explanation = "Erreur, attention au Cb !"
         elif Ny - N == 1:
-            explanation = "Presque !"
+            explanation = "Erreur, mais presque !"
         elif Ny in [71, 72, 73, 41, 42, 43, 23, 44, 100]:
             explanation = "Attention, classe rare !"
         else:
-            explanation = ""
+            explanation = "Erreur !"
     else:
-        explanation = ""
+        explanation = "Bien vu !"
 
     # Format the solution and explanation
     solution = f"Solution : {Ny}"
