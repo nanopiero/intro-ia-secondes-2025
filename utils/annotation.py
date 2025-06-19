@@ -138,13 +138,54 @@ def complete_dict_from_worksheet(worksheet, data_dict):
     return data_dict
 
 
+def compare_labels(dict_tuto_labels, filename_to_labels):
+    # Extract the single key-value pair from filename_to_labels
+    filename, labels = list(filename_to_labels.items())[0]
 
+    # Retrieve the corresponding value from dict_tuto_labels
+    tutorial_labels = dict_tuto_labels.get(filename)
 
+    if tutorial_labels is None:
+        return "Image non annotée pour le tutoriel."
+
+    # Extract the values to compare (assuming 'Classe' is the key we are interested in)
+    N = labels.get('Classe')
+    Ny = tutorial_labels.get('Classe')
+
+    if N is None or Ny is None:
+        return "Image non annotée pour le tutoriel."
+
+    try:
+        # Convert N and Ny to integers
+        N = int(N)
+        Ny = int(Ny)
+    except (ValueError, TypeError):
+        return "Image non annotée pour le tutoriel."
+
+    # Compare N and Ny and generate the explanation
+    if N != Ny:
+        if Ny == 2:
+            explanation = "Attention au Cb !"
+        elif Ny - N == 1:
+            explanation = "Presque !"
+        elif Ny in [71, 72, 73, 41, 42, 43, 23, 44, 100]:
+            explanation = "Attention, classe rare !"
+        else:
+            explanation = ""
+    else:
+        explanation = ""
+
+    # Format the solution and explanation
+    solution = f"Solution : {Ny}"
+    result = f"{solution} {explanation}".strip()
+
+    return result
 
 
 
 class AnnotationUI:
-    def __init__(self, image_dir, worksheet, direction):
+    def __init__(self, image_dir, worksheet, direction, mode='tutoriel'):
+        self.mode = mode
         self.image_dir = image_dir
         self.worksheet = worksheet
         self.direction = direction
@@ -156,7 +197,11 @@ class AnnotationUI:
                                   'O': [1, 4, 3, 2, 0], 
                                   'S': [2, 1, 4, 3, 0],  
                                }
-        self.dict_labels = complete_dict_from_worksheet(worksheet, build_initial_dict_from_images(image_dir))
+        if self.mode == 'tutoriel':
+            self.dict_labels = build_initial_dict_from_images(image_dir)
+            self.dict_tuto_labels = complete_dict_from_worksheet(worksheet, build_initial_dict_from_images(image_dir))
+        else:
+            self.dict_labels = complete_dict_from_worksheet(worksheet, build_initial_dict_from_images(image_dir))
 
         self.subfolders = self._get_subfolders()
         self.color_map = assign_colors(self.dict_labels, direction)
@@ -318,9 +363,12 @@ class AnnotationUI:
                     # self.dict_labels[image_name].update(labels)
                     # update the dict and the google sheet
                     result = send_labels(self.dict_labels, filename_to_labels)
-                    update_worksheet(self.worksheet, filename_to_labels)
-
-                    print(f'annotation {label_text} prise en compte')
+                    if self.mode == 'tutoriel':
+                        comparison_result = compare_labels(self.dict_tuto_labels, filename_to_labels)
+                        print(comparison_result)
+                    else:
+                        update_worksheet(self.worksheet, filename_to_labels)
+                        print(f'annotation {label_text} prise en compte')
             except Exception as e:
                 print("Error:", e)
         change.value = ''
