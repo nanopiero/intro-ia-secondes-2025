@@ -176,8 +176,9 @@ def compare_labels(dict_tuto_labels, filename_to_labels):
         explanation = "Bien vu !"
 
     # Format the solution and explanation
-    solution = f"Solution : {Ny}"
-    result = f"{solution} {explanation}".strip()
+    choice = f"Classe choisie : c{N}" 
+    solution = f"Solution : c{Ny}"
+    result = f"{choice} ; {explanation} ; {solution}".strip()
 
     return result
 
