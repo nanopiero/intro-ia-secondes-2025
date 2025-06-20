@@ -167,11 +167,11 @@ def compare_labels(dict_tuto_labels, filename_to_labels):
         if Ny == 2:
             explanation = "Erreur, attention au Cb !"
         elif Ny - N == 1:
-            explanation = "Erreur, mais presque !"
+            explanation = "Erreur (?), mais pas loin !"
         elif Ny in [71, 72, 73, 41, 42, 43, 23, 44, 100]:
             explanation = "Attention, classe rare !"
         else:
-            explanation = "Erreur !"
+            explanation = "Erreur (?)"
     else:
         explanation = "Bien vu !"
 
